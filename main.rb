@@ -1,4 +1,6 @@
-require './token.rb'
-require './token_stream.rb'
+require './parser.rb'
 
-puts 1
+parser = Parser.new(File.read('./main.c'))
+
+tokens = parser.parse
+tokens.debug

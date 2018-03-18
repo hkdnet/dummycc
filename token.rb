@@ -1,14 +1,21 @@
 class Token
-  attr_reader :token, :str, :num, :lineno
+  attr_reader :type, :str, :num, :lineno
 
-  def initialize(type, str, num, lineno)
+  def initialize(type, str, lineno)
     @type = type
     @str = str
     @lineno = lineno
     if type == :digit
-      @num = num.to_i
-    else
-      @num = 0x7fffffff
+      @num = str.to_i
     end
+  end
+
+  def inspect
+    text = "#{type}: #{str}"
+    if @num
+      text << " as #{num}"
+    end
+    text << " at #{lineno}"
+    text
   end
 end
