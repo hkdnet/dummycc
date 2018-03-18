@@ -14,6 +14,7 @@ class Parser
     colno = 0
     while lineno < lines.size
       lineno += 1
+      colno = 0
       line = lines[lineno - 1]
 
       while colno < line.size
