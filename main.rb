@@ -1,6 +1,9 @@
-require './parser.rb'
+require 'English'
+$LOAD_PATH.unshift(File.expand_path('./lib', __dir__))
 
-parser = Parser.new(File.read('./main.c'))
+require 'dummycc'
+
+parser = DummyCC::Parser.new(File.read('./main.c'))
 
 tokens = parser.parse
 tokens.debug
