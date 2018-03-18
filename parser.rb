@@ -103,7 +103,7 @@ class Parser
   end
 
   def alphanum?(lineno, colno)
-    alpha?(lineno, colno) && digit?(lineno, colno)
+    alpha?(lineno, colno) || digit?(lineno, colno)
   end
 
   def eol?(lineno, colno)
