@@ -46,7 +46,7 @@ module DummyCC
               tokens.add_token(Token.new(token_str, :identifier, lineno))
             end
           elsif digit?(lineno, colno)
-            if char_at(lineno, colno)
+            if char_at(lineno, colno) == '0'
               token_str += char_at(lineno, colno)
               tokens.add_token(Token.new(token_str, :digit, lineno))
             else
