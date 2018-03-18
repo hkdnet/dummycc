@@ -19,8 +19,9 @@ module DummyCC
           colno += 1
           if comment?
             if comment_end?(lineno, colno)
-              next @comment = false
+              @comment = false
             end
+            next
           end
 
           if space?(lineno, colno)
