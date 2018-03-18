@@ -11,6 +11,14 @@ module DummyCC
       end
     end
 
+    def ==(other)
+      other.is_a?(DummyCC::Token) &&
+        type == other.type &&
+        str == other.str &&
+        num == other.num &&
+        lineno == other.lineno
+    end
+
     def inspect
       text = "#{type}: #{str}"
       if @num
