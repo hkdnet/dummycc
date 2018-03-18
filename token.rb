@@ -1,9 +1,9 @@
 class Token
   attr_reader :type, :str, :num, :lineno
 
-  def initialize(type, str, lineno)
-    @type = type
+  def initialize(str, type, lineno)
     @str = str
+    @type = type
     @lineno = lineno
     if type == :digit
       @num = str.to_i
