@@ -60,8 +60,6 @@ module DummyCC
               tokens.add_token(Token.new(token_str, :digit, lineno))
             end
           elsif char_at(lineno, colno) == '/'
-            token_str += char_at(lineno, colno)
-
             if char_at(lineno, colno + 1) == '/'
               # この行読み飛ばし。
               # TODO: これあってるか？
@@ -72,6 +70,7 @@ module DummyCC
               @comment = true
               next
             else # divider
+              token_str += char_at(lineno, colno)
               tokens.add_token(Token.new(token_str, :symbol, lineno))
             end
           else
