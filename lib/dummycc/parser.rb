@@ -20,6 +20,7 @@ module DummyCC
           if comment?
             if comment_end?(lineno, colno)
               @comment = false
+              colno += 1
             end
             next
           end
