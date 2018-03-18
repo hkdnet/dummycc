@@ -41,4 +41,17 @@ RSpec.describe DummyCC::Parser do
       ]
     end
   end
+
+  describe '1+1' do
+    let(:text) { '1+1' }
+
+    it do
+      expect(tokens.instance_variable_get('@tokens')).to eq [
+        DummyCC::Token.new('1', :digit, 1),
+        DummyCC::Token.new('+', :symbol, 1),
+        DummyCC::Token.new('1', :digit, 1),
+        DummyCC::Token.new('', :eof, 1),
+      ]
+    end
+  end
 end
