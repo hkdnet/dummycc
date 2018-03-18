@@ -54,4 +54,17 @@ RSpec.describe DummyCC::Parser do
       ]
     end
   end
+
+  describe 'int i;' do
+    let(:text) { 'int i;' }
+
+    it do
+      expect(tokens.instance_variable_get('@tokens')).to eq [
+        DummyCC::Token.new('int', :int, 1),
+        DummyCC::Token.new('i', :identifier, 1),
+        DummyCC::Token.new(';', :symbol, 1),
+        DummyCC::Token.new('', :eof, 1),
+      ]
+    end
+  end
 end
