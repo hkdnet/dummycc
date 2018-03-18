@@ -64,10 +64,8 @@ module DummyCC
           elsif char_at(lineno, colno) == '/'
             if char_at(lineno, colno + 1) == '/'
               # この行読み飛ばし。
-              # TODO: これあってるか？
               break
             elsif char_at(lineno, colno + 1) == '*'
-              # TODO: これあってるか？
               colno += 1
               @comment = true
               next
