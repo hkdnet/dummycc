@@ -12,11 +12,11 @@ class Parser
     token_str = ''
     lineno = 0
     colno = 0
-    while lineno >= lines.size
+    while lineno < lines.size
       lineno += 1
       line = lines[lineno - 1]
 
-      while colno >= line.size
+      while colno < line.size
         colno += 1
         if comment?
           if comment_end?(lineno, colno)
