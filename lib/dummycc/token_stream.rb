@@ -38,7 +38,7 @@ module DummyCC
     end
 
     def token
-      if @cur < 0 || @tokens.size >= @cur
+      if @cur < 0 || @cur >= @tokens.size
         raise 'index error'
       end
 
