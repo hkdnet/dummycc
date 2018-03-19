@@ -16,6 +16,7 @@ module DummyCC
     def add_token(token)
       @tokens << token
     end
+    alias << add_token
 
     def next(diff = 1)
       @cur += diff
@@ -38,8 +39,8 @@ module DummyCC
     end
 
     def token
-      if @cur < 0 || @tokens.size >= @cur
-        raise 'index error'
+      if @cur < 0 || @cur >= @tokens.size
+        raise DummyCC::IndexError, "size: #{@tokens.size}, cur: #{@cur}"
       end
 
       @tokens[@cur]
