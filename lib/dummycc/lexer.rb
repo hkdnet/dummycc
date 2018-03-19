@@ -1,5 +1,5 @@
 module DummyCC
-  class Parser
+  class Lexer
     def initialize(text)
       @text = text
       @comment = false

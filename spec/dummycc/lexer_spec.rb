@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-RSpec.describe DummyCC::Parser do
-  let(:parser) { DummyCC::Parser.new(text) }
-  let(:tokens) { parser.parse }
+RSpec.describe DummyCC::Lexer do
+  let(:lexer) { DummyCC::Lexer.new(text) }
+  let(:tokens) { lexer.parse }
 
   describe '行コメント' do
     let(:text) do
