@@ -45,7 +45,7 @@ RSpec.describe DummyCC::TokenStream do
     context 'invalid index' do
       it do
         tokens.prev
-        expect { tokens.token }.to raise_error
+        expect { tokens.token }.to raise_error DummyCC::IndexError
       end
     end
   end
