@@ -47,6 +47,11 @@ RSpec.describe DummyCC::TokenStream do
         tokens.prev
         expect { tokens.token }.to raise_error DummyCC::IndexError
       end
+
+      it do
+        tokens.next(4)
+        expect { tokens.token }.to raise_error DummyCC::IndexError
+      end
     end
   end
 end
