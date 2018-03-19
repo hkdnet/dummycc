@@ -1,0 +1,37 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/dummycc
+    docker:
+      - image: circleci/ruby:2.5-node
+        environment:
+          BUNDLE_JOBS: 3
+          BUNDLE_RETRY: 3
+          BUNDLE_PATH: vendor/bundle
+          RUBY_ENV: test
+    steps:
+      - checkout
+      - run:
+          name: Which bundler?
+          command: bundle -v
+      - restore_cache:
+          keys:
+            - dummycc-bundle-{{ checksum "Gemfile.lock" }}
+            - dummycc-bundle-
+      - run:
+          name: Bundle Install
+          command: bundle check || bundle install
+      - save_cache:
+          key: dummycc-bundle-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+      - type: shell
+        command: |
+          bundle exec rspec --profile 10 \
+                            --format RspecJunitFormatter \
+                            --out test_results/rspec.xml \
+                            --format progress \
+                            $(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)
+      # Save test results for timing analysis
+      - store_test_results:
+          path: test_results
