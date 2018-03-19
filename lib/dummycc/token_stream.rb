@@ -16,6 +16,7 @@ module DummyCC
     def add_token(token)
       @tokens << token
     end
+    alias << add_token
 
     def next(diff = 1)
       @cur += diff
