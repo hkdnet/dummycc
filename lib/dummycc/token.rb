@@ -1,6 +1,5 @@
 module DummyCC
   class Token
-    class UnknownTypeError < StandardError; end
     TYPES = %i(int return identifier digit symbol eof).freeze
     private_constant :TYPES
 
@@ -8,7 +7,7 @@ module DummyCC
 
     def initialize(str, type, lineno)
       unless TYPES.include?(type)
-        raise UnknownTypeError, type
+        raise DummyCC::UnknownTypeError, type
       end
 
       @str = str

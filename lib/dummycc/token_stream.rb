@@ -40,7 +40,7 @@ module DummyCC
 
     def token
       if @cur < 0 || @cur >= @tokens.size
-        raise 'index error'
+        raise DummyCC::IndexError, "size: #{@tokens.size}, cur: #{@cur}"
       end
 
       @tokens[@cur]

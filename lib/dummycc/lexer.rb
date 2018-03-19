@@ -79,7 +79,7 @@ module DummyCC
               token_str += char_at(lineno, colno)
               tokens.add_token(Token.new(token_str, :symbol, lineno))
             else
-              raise "Unclear token: #{char_at(lineno, colno)} at line: #{lineno}, col: #{colno}"
+              raise DummyCC::SyntaxError, "Unclear token: #{char_at(lineno, colno)} at line: #{lineno}, col: #{colno}"
             end
           end
 
