@@ -1,8 +1,16 @@
 module DummyCC
   class Token
+    class UnknownTypeError < StandardError; end
+    TYPES = %i(int return identifier digit symbol eof).freeze
+    private_constant :TYPES
+
     attr_reader :type, :str, :num, :lineno
 
     def initialize(str, type, lineno)
+      unless TYPES.include?(type)
+        raise UnknownTypeError, type
+      end
+
       @str = str
       @type = type
       @lineno = lineno
