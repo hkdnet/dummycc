@@ -50,6 +50,8 @@ module DummyCC
       proto
     end
 
+    # PROTOTYPE := TYPE IDENTIFIER ( PARAMETER[, PARAMETER] )
+    # PARAMETER := TYPE IDENTIFIER
     def visit_prototype
       bkup = @tokens.cur
 
