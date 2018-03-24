@@ -9,6 +9,9 @@ RSpec.describe DummyCC::Parser do
     let(:text) do
       <<-EOS
 int foo(int arg);
+int bar(int arg) {
+  return 1;
+}
       EOS
     end
 

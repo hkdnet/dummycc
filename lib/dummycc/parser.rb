@@ -87,16 +87,31 @@ module DummyCC
       nil
     end
 
+    # @return [DummyCC::AST::Function]
     def visit_function_definition
-      bkup = @tokens.cur
       proto = visit_prototype
       return nil unless proto
 
       # TODO: 再定義チェック
-      visit_function_statement(proto)
+      body = visit_function_statement(proto)
+      DummyCC::AST::Function.new(proto, body)
     end
 
-    def visit_function_statement
+    # @return [DummyCC::AST::FunctionStmt]
+    def visit_function_statement(proto)
+      bkup = @tokens.cur
+      return nil unless @tokens.token_str == '{'
+      @tokens.next
+      body = DummyCC::AST::FunctionStmt.new
+      until @tokens.token_str == '}'
+        @tokens.next
+      end
+      unless @tokens.token_str == '}'
+        @tokens.cur = bkup
+        return nil
+      end
+      @tokens.next
+      body
     end
   end
 end
