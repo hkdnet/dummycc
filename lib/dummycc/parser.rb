@@ -22,6 +22,25 @@ module DummyCC
     end
 
     def visit_external_declaration(tu)
+      proto = visit_function_declaration
+      if proto
+        tu.add_proto(proto)
+        return
+      end
+      func_def = visit_function_definition
+      if func_def
+        tu.add_func(func_def)
+        return
+      end
+      raise 'No Functions...?'
+    end
+
+    def visit_function_declaration
+      false
+    end
+
+    def visit_function_definition
+      true
     end
   end
 end
