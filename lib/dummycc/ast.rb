@@ -53,4 +53,20 @@ module DummyCC::AST
       @expr = expr
     end
   end
+
+  class Variable < Base
+    attr_reader :name
+
+    def initialize(name)
+      @name = name
+    end
+  end
+
+  class Number < Base
+    attr_reader :val
+
+    def initialize(val)
+      @val = val
+    end
+  end
 end
