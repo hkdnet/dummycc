@@ -7,4 +7,6 @@ module DummyCC
   end
   class UnknownTypeError < BaseError
   end
+  class UnknownDeclTypeError < BaseError
+  end
 end
