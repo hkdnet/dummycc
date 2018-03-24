@@ -36,11 +36,65 @@ module DummyCC
     end
 
     def visit_function_declaration
-      false
+      bkup = @tokens.cur
+      proto = visit_prototype
+      return nil unless proto
+
+      unless @tokens.token.str == ';'
+        # 関数定義だったので元に戻して visit_function_definition に任せる
+        @tokens.cur = bkup
+        return nil
+      end
+      # TODO: 再定義チェック
+      @tokens.next
+      proto
+    end
+
+    def visit_prototype
+      bkup = @tokens.cur
+
+      return nil unless @tokens.token_type == :int
+      @tokens.next
+      return nil unless @tokens.token_type == :identifier
+      name = @tokens.token_str
+      @tokens.next
+      return nil unless @tokens.token_str == '('
+      @tokens.next
+
+      is_first_param = true
+      params = []
+      loop do
+        if !is_first_param && @tokens.token_type == :symbol && @tokens.token_str == ','
+          @tokens.next
+        end
+
+        break unless @tokens.token_type == :int
+        @tokens.next
+
+        break unless @tokens.token_type == :identifier
+        # TODO: 仮引数名重複チェック
+        params << @tokens.token_str
+        @tokens.next
+
+        if @tokens.token_str == ')'
+          @tokens.next
+          return DummyCC::AST::Prototype.new(name, params)
+        end
+      end
+      @tokens.cur = bkup
+      nil
     end
 
     def visit_function_definition
-      true
+      bkup = @tokens.cur
+      proto = visit_prototype
+      return nil unless proto
+
+      # TODO: 再定義チェック
+      visit_function_statement(proto)
+    end
+
+    def visit_function_statement
     end
   end
 end
