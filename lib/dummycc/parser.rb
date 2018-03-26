@@ -77,6 +77,7 @@ module DummyCC
         # TODO: 仮引数名重複チェック
         params << @tokens.token_str
         @tokens.next
+        is_first_param = false
 
         if @tokens.token_str == ')'
           @tokens.next
