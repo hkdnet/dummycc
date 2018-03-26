@@ -1,13 +1,13 @@
 require 'spec_helper'
 
 RSpec.describe DummyCC::Parser do
-  describe '疎通確認用' do
-    subject(:tu) { parser.exec }
+  subject(:tu) { parser.exec }
 
-    let(:parser) { DummyCC::Parser.new(tokens) }
-    let(:tokens) do
-      DummyCC::Lexer.new(text).parse
-    end
+  let(:parser) { DummyCC::Parser.new(tokens) }
+  let(:tokens) do
+    DummyCC::Lexer.new(text).parse
+  end
+  describe '疎通確認用' do
     let(:text) do
       <<-EOS
 int foo(int arg);
