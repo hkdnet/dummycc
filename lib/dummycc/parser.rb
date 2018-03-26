@@ -146,6 +146,10 @@ module DummyCC
     def visit_statement
       return nil if @tokens.token_str == '}'
       # TODO: impl
+      if @tokens.token_type == :return
+        @tokens.next
+        return DummyCC::AST::JumpStmt.new(nil)
+      end
       @tokens.next
     end
   end
