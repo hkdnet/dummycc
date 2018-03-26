@@ -81,7 +81,7 @@ int foo(int arg) {
   describe 'expression statement' do
     let(:text) do
       <<-EOS
-int foo(int t) {
+int foo() {
   int a;
   ;
   a = 1;
