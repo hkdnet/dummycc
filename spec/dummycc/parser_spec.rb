@@ -136,5 +136,17 @@ int foo() {
         expect { parser.exec }.to output("Duplicated function declaration for foo\n").to_stderr
       end
     end
+
+    describe '仮引数の重複' do
+      let(:text) do
+        <<-EOS
+  int foo(int a, int a);
+        EOS
+      end
+
+      it do
+        expect { parser.exec }.to raise_error(DummyCC::DuplicateVariableNameError, "Duplicate variable names are found in foo at 1")
+      end
+    end
   end
 end
