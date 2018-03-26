@@ -77,4 +77,36 @@ int foo(int arg) {
       expect(foo_body.variable_decl_at(2)).to be_nil
     end
   end
+
+  describe 'expression statement' do
+    let(:text) do
+      <<-EOS
+int foo(int t) {
+  int a;
+  ;
+  a = 1;
+  return a;
+}
+      EOS
+    end
+
+    it 'stmt' do
+      foo = tu.func_at(0)
+      foo_body = foo.body
+
+      stmt1 = foo_body.stmt_at(0)
+      expect(stmt1).to be_a DummyCC::AST::NullExpr
+
+      stmt2 = foo_body.stmt_at(1)
+      expect(stmt2).to be_a DummyCC::AST::BinaryExpr
+      expect(stmt2.op).to eq '='
+      expect(stmt2.l).to eq DummyCC::AST::Variable.new('a')
+      expect(stmt2.r).to eq DummyCC::AST::Number.new(1)
+
+      stmt3 = foo_body.stmt_at(2)
+      expect(stmt3).to be_a DummyCC::AST::JumpStmt
+
+      expect(foo_body.stmt_at(3)).to be_nil
+    end
+  end
 end
