@@ -7,12 +7,6 @@ module DummyCC
       @tokens = []
     end
 
-    def debug
-      @tokens.each do |token|
-        puts token.inspect
-      end
-    end
-
     def add_token(token)
       @tokens << token
     end
@@ -36,6 +30,50 @@ module DummyCC
 
     def token_num
       token.num
+    end
+
+    def plus?
+      token_type == :symbol && token_str == '+'
+    end
+
+    def minus?
+      token_type == :symbol && token_str == '-'
+    end
+
+    def asterisk?
+      token_type == :symbol && token_str == '*'
+    end
+
+    def slash?
+      token_type == :symbol && token_str == '/'
+    end
+
+    def semicolon?
+      token_type == :symbol && token_str == ';'
+    end
+
+    def comma?
+      token_type == :symbol && token_str == ','
+    end
+
+    def l_paren?
+      token_type == :symbol && token_str == '('
+    end
+
+    def r_paren?
+      token_type == :symbol && token_str == ')'
+    end
+
+    def l_brace?
+      token_type == :symbol && token_str == '{'
+    end
+
+    def r_brace?
+      token_type == :symbol && token_str == '}'
+    end
+
+    def symbol_eq?
+      token_type == :symbol && token_str == '='
     end
 
     def token
