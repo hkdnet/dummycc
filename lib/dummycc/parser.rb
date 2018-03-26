@@ -104,12 +104,15 @@ module DummyCC
       return nil unless @tokens.token_str == '{'
       @tokens.next
       body = DummyCC::AST::FunctionStmt.new
-      until @tokens.token_str == '}'
+      loop do
         @tokens.next
-      end
-      unless @tokens.token_str == '}'
-        @tokens.cur = bkup
-        return nil
+        if @tokens.token_str == '}'
+          break
+        end
+        if @tokens.token_type == :eof
+          @tokens.cur = bkup
+          return nil
+        end
       end
       @tokens.next
       body
