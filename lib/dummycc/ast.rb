@@ -9,6 +9,7 @@ require 'dummycc/ast/jump_stmt'
 require 'dummycc/ast/call_expr'
 require 'dummycc/ast/variable'
 require 'dummycc/ast/number'
+require 'dummycc/ast/null_expr'
 
 # functions
 require 'dummycc/ast/function_stmt'
