@@ -109,4 +109,20 @@ int foo() {
       expect(foo_body.stmt_at(3)).to be_nil
     end
   end
+
+  context 'error' do
+    describe '型不一致' do
+      let(:text) do
+        <<-EOS
+  int foo(int a);
+  int foo(int a, int b);
+        EOS
+      end
+
+      it do
+        expect { parser.exec }.to raise_error DummyCC::ConflictingTypesError
+      end
+    end
+
+  end
 end
