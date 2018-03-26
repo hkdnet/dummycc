@@ -188,10 +188,61 @@ module DummyCC
       nil
     end
 
-    def visit_additive_expr
-      # TODO: impl
-      @tokens.next
-      DummyCC::AST::Number.new(1)
+    # @param lhs [DummyCC::AST::Base]
+    def visit_additive_expr(lhs)
+      bkup = @tokens.cur
+
+      if lhs.nil?
+        lhs = visit_multiplicative_expr(nil)
+        return nil if lhs.nil?
+      end
+      if @tokens.token_type == :symbol && @tokens.token_str == '+'
+        @tokens.next
+        rhs = visit_multiplicative_expr(nil)
+        unless rhs
+          @tokens.cur = bkup
+          return nil
+        end
+        return visit_additive_expr(DummyCC::AST::BinaryExpr.new('+', lhs, rhs))
+      elsif @tokens.token_type == :symbol && @tokens.token_str == '-'
+        @tokens.next
+        rhs = visit_multiplicative_expr(nil)
+        unless rhs
+          @tokens.cur = bkup
+          return nil
+        end
+        return visit_additive_expr(DummyCC::AST::BinaryExpr.new('-', lhs, rhs))
+      end
+      lhs
+    end
+
+    def visit_multiplicative_expr(lhs)
+      bkup = @tokens.cur
+
+      if lhs.nil?
+        lhs = visit_postfix_expr
+        return nil if lhs.nil?
+      end
+
+      if @tokens.token_type == :symbol && @tokens.token_str == '*'
+        @tokens.next
+
+        rhs = visit_postfix_expr
+        unless rhs
+          @tokens.cur = bkup
+          return nil
+        end
+        return visit_multiplicative_expr(DummyCC::AST::BinaryExpr.new('*', lhs, rhs))
+      elsif @tokens.token_type == :symbol && @tokens.token_str == '/'
+        @tokens.next
+
+        rhs = visit_postfix_expr
+        unless rhs
+          @tokens.cur = bkup
+          return nil
+        end
+        return visit_multiplicative_expr(DummyCC::AST::BinaryExpr.new('/', lhs, rhs))
+      end
     end
   end
 end
