@@ -177,13 +177,13 @@ module DummyCC
         @tokens.next
         if @tokens.token_type == :symbol && @tokens.token_str == '='
           @tokens.next
-          r = visit_additive_expr
+          r = visit_additive_expr(nil)
           return DummyCC::AST::BinaryExpr.new("=", l, r) if r
         end
         @tokens.cur = bkup
       end
 
-      add_expr = visit_additive_expr
+      add_expr = visit_additive_expr(nil)
       return add_expr if add_expr
       nil
     end
