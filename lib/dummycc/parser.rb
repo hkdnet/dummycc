@@ -244,5 +244,84 @@ module DummyCC
         return visit_multiplicative_expr(DummyCC::AST::BinaryExpr.new('/', lhs, rhs))
       end
     end
+
+    # POSTFIX_EXPR := PRIMARY_EXPR | IDENTIFIER ( [ASSIGNMENT_EXPR [, ASSIGNMENT_EXPR]] )
+    def visit_postfix_expr
+      bkup = @tokens.cur
+
+      expr = visit_primary_expr
+      return expr if expr
+
+      unless @tokens.cur_type == :identifier
+        return nil
+      end
+
+      callee = @tokens.cur_str
+      @tokens.next
+      unless @tokens.cur_type == :symbol && @tokens.cur_str == '('
+        @tokens.cur = bkup
+        return nil
+      end
+      @tokens.next
+      args = []
+      is_first_arg = true
+      loop do
+        if !is_first_arg
+          unless @tokens.cur_type == :symbol && @tokens.cur_str == ','
+            @tokens.cur = bkup
+            return nil
+          end
+          @tokens.next
+        end
+        is_first_arg = false
+        expr = visit_assignment_expr
+        if expr
+          args << expr
+        else
+          break
+        end
+      end
+
+      unless @tokens.cur_type == :symbol && @tokens.cur_str == ')'
+        @tokens.cur = bkup
+        return nil
+      end
+      @tokens.next
+
+      DummyCC::AST::CallExpr.new(callee, args)
+    end
+
+    # PRIMARY_EXPR := IDENTIFIER | INTEGER | ( ADDITIVE_EXPR )
+    def visit_primary_expr
+      bkup = @tokens.cur
+
+      if @tokens.token_type == :identifier
+        var = DummyCC::AST::Variable.new(@tokens.token_str)
+        @tokens.next
+        return var
+      elsif @tokens.token_type == :digit
+        num = DummyCC::AST::Number.new(@tokens.token_num)
+        @tokens.next
+        return num
+      elsif @tokens.token_type == :symbol && @tokens.token_str == '-'
+        @tokens.next
+        if @tokens.token_type == :digit
+          num = DummyCC::AST::Number.new(-@tokens.toen_num)
+          @tokens.next
+          return num
+        end
+        @tokens.cur = bkup
+      elsif @tokens.token_type == :symbol && @tokens.token_str == '('
+        @tokens.next
+        expr = visit_additive_expr(nil)
+        if expr && @tokens.token_type == :symbol && @tokens.token_str == ')'
+          @tokens.next
+          return expr
+        end
+        @tokens.cur = bkup
+      end
+
+      nil
+    end
   end
 end
