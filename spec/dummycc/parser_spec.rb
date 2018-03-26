@@ -33,6 +33,10 @@ int bar(int arg1, int arg2) {
       expect(bar_proto.param_name_at(0)).to eq 'arg1'
       expect(bar_proto.param_name_at(1)).to eq 'arg2'
       expect(bar_proto.param_name_at(2)).to be_nil
+      bar_body = bar_func.body
+      expect(bar_body.variable_decl_at(0)).to be_nil
+      stmt = bar_body.stmt_at(0)
+      expect(stmt).to be_a DummyCC::AST::JumpStmt
     end
   end
 end
