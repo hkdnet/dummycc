@@ -9,4 +9,6 @@ module DummyCC
   end
   class UnknownDeclTypeError < BaseError
   end
+  class ConflictingTypesError < BaseError
+  end
 end
