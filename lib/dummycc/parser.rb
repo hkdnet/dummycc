@@ -139,8 +139,25 @@ module DummyCC
     end
 
     def visit_variable_declaration
-      # TODO: impl
-      nil
+      bkup = @tokens.cur
+
+      unless @tokens.token_type == :int
+        @tokens.cur = bkup
+        return nil
+      end
+      @tokens.next
+      unless @tokens.token_type == :identifier
+        @tokens.cur = bkup
+        return nil
+      end
+      name = @tokens.token_str
+      @tokens.next
+      unless @tokens.token_type == :symbol && @tokens.token_str == ';'
+        @tokens.cur = bkup
+        return nil
+      end
+      @tokens.next
+      DummyCC::AST::VariableDecl.new(name, :local)
     end
 
     def visit_statement
