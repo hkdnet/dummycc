@@ -62,7 +62,7 @@ int foo(int arg) {
       EOS
     end
 
-    it 'proto' do
+    it do
       foo = tu.func_at(0)
       foo_body = foo.body
 
