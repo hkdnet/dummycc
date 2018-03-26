@@ -48,6 +48,7 @@ int bar(int arg1, int arg2) {
       expect(bar_body.variable_decl_at(2)).to be_nil
       stmt = bar_body.stmt_at(0)
       expect(stmt).to be_a DummyCC::AST::JumpStmt
+      expect(stmt.expr).to eq DummyCC::AST::Number.new(1)
     end
   end
 end
