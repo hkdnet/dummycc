@@ -133,7 +133,7 @@ int foo() {
       end
 
       it do
-        expect { parser.exec }.to output("dup\n").to_stderr
+        expect { parser.exec }.to output("Duplicated function declaration for foo\n").to_stderr
       end
     end
   end

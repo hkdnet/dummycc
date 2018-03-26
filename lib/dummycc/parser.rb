@@ -54,7 +54,7 @@ module DummyCC
       if @signatures.key?(proto.name)
         if proto.to_signature == @signatures[proto.name]
           # 完全一致なのでwarningだけ
-          warn('dup')
+          warn("Duplicated function declaration for #{proto.name}")
         else
           raise DummyCC::ConflictingTypesError, "for function #{proto.name}"
         end
