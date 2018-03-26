@@ -11,4 +11,6 @@ module DummyCC
   end
   class ConflictingTypesError < BaseError
   end
+  class DuplicateVariableNameError < BaseError
+  end
 end
