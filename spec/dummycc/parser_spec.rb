@@ -11,7 +11,7 @@ RSpec.describe DummyCC::Parser do
     let(:text) do
       <<-EOS
 int foo(int arg);
-int bar(int arg1) {
+int bar(int arg1, int arg2) {
   return 1;
 }
       EOS
@@ -31,7 +31,8 @@ int bar(int arg1) {
       expect(bar_func.name).to eq 'bar'
       bar_proto = bar_func.proto
       expect(bar_proto.param_name_at(0)).to eq 'arg1'
-      expect(bar_proto.param_name_at(1)).to be_nil
+      expect(bar_proto.param_name_at(1)).to eq 'arg2'
+      expect(bar_proto.param_name_at(2)).to be_nil
     end
   end
 end
