@@ -78,11 +78,11 @@ module DummyCC
       @tokens.next
 
       is_first_param = true
-      params = []
+      params = {}
       loop do
         if @tokens.r_paren?
           @tokens.next
-          return DummyCC::AST::Prototype.new(name, params)
+          return DummyCC::AST::Prototype.new(name, params.keys)
         end
 
         if !is_first_param && @tokens.comma?
@@ -94,7 +94,7 @@ module DummyCC
 
         break unless @tokens.token_type == :identifier
         # TODO: 仮引数名重複チェック
-        params << @tokens.token_str
+        params[@tokens.token_str] = true
         @tokens.next
         is_first_param = false
       end
