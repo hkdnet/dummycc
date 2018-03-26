@@ -145,12 +145,190 @@ module DummyCC
 
     def visit_statement
       return nil if @tokens.token_str == '}'
+      stmt = visit_expression_stmt
+      return stmt if stmt
+      stmt = visit_jump_stmt
+      return stmt if stmt
+      @tokens.next
+    end
+
+    def visit_expression_stmt
       # TODO: impl
-      if @tokens.token_type == :return
-        @tokens.next
-        return DummyCC::AST::JumpStmt.new(nil)
+      nil
+    end
+
+    def visit_jump_stmt
+      return nil unless @tokens.token_type == :return
+      bkup = @tokens.cur
+      @tokens.next
+      expr = visit_assignment_expr
+      unless expr
+        @tokens.cur = bkup
+        return nil
+      end
+
+      unless @tokens.token_type == :symbol && @tokens.token_str == ';'
+        @tokens.cur = bkup
+        return nil
       end
       @tokens.next
+      DummyCC::AST::JumpStmt.new(expr)
+    end
+
+    # ASSIGNMENT_EXPR := IDENTIFIER = ADDITIVE_EXPR | ADDITIVE_EXPR
+    def visit_assignment_expr
+      bkup = @tokens.cur
+      if @tokens.token_type == :identifier
+        l = DummyCC::AST::Variable.new(@tokens.token_str)
+        @tokens.next
+        if @tokens.token_type == :symbol && @tokens.token_str == '='
+          @tokens.next
+          r = visit_additive_expr(nil)
+          return DummyCC::AST::BinaryExpr.new("=", l, r) if r
+        end
+        @tokens.cur = bkup
+      end
+
+      add_expr = visit_additive_expr(nil)
+      return add_expr if add_expr
+      nil
+    end
+
+    # @param lhs [DummyCC::AST::Base]
+    def visit_additive_expr(lhs)
+      bkup = @tokens.cur
+
+      if lhs.nil?
+        lhs = visit_multiplicative_expr(nil)
+        return nil if lhs.nil?
+      end
+      if @tokens.token_type == :symbol && @tokens.token_str == '+'
+        @tokens.next
+        rhs = visit_multiplicative_expr(nil)
+        unless rhs
+          @tokens.cur = bkup
+          return nil
+        end
+        return visit_additive_expr(DummyCC::AST::BinaryExpr.new('+', lhs, rhs))
+      elsif @tokens.token_type == :symbol && @tokens.token_str == '-'
+        @tokens.next
+        rhs = visit_multiplicative_expr(nil)
+        unless rhs
+          @tokens.cur = bkup
+          return nil
+        end
+        return visit_additive_expr(DummyCC::AST::BinaryExpr.new('-', lhs, rhs))
+      end
+      lhs
+    end
+
+    def visit_multiplicative_expr(lhs)
+      bkup = @tokens.cur
+
+      if lhs.nil?
+        lhs = visit_postfix_expr
+        return nil if lhs.nil?
+      end
+
+      if @tokens.token_type == :symbol && @tokens.token_str == '*'
+        @tokens.next
+
+        rhs = visit_postfix_expr
+        unless rhs
+          @tokens.cur = bkup
+          return nil
+        end
+        return visit_multiplicative_expr(DummyCC::AST::BinaryExpr.new('*', lhs, rhs))
+      elsif @tokens.token_type == :symbol && @tokens.token_str == '/'
+        @tokens.next
+
+        rhs = visit_postfix_expr
+        unless rhs
+          @tokens.cur = bkup
+          return nil
+        end
+        return visit_multiplicative_expr(DummyCC::AST::BinaryExpr.new('/', lhs, rhs))
+      end
+      lhs
+    end
+
+    # POSTFIX_EXPR := PRIMARY_EXPR | IDENTIFIER ( [ASSIGNMENT_EXPR [, ASSIGNMENT_EXPR]] )
+    def visit_postfix_expr
+      bkup = @tokens.cur
+
+      expr = visit_primary_expr
+      return expr if expr
+
+      unless @tokens.cur_type == :identifier
+        return nil
+      end
+
+      callee = @tokens.cur_str
+      @tokens.next
+      unless @tokens.cur_type == :symbol && @tokens.cur_str == '('
+        @tokens.cur = bkup
+        return nil
+      end
+      @tokens.next
+      args = []
+      is_first_arg = true
+      loop do
+        if !is_first_arg
+          unless @tokens.cur_type == :symbol && @tokens.cur_str == ','
+            @tokens.cur = bkup
+            return nil
+          end
+          @tokens.next
+        end
+        is_first_arg = false
+        expr = visit_assignment_expr
+        if expr
+          args << expr
+        else
+          break
+        end
+      end
+
+      unless @tokens.cur_type == :symbol && @tokens.cur_str == ')'
+        @tokens.cur = bkup
+        return nil
+      end
+      @tokens.next
+
+      DummyCC::AST::CallExpr.new(callee, args)
+    end
+
+    # PRIMARY_EXPR := IDENTIFIER | INTEGER | ( ADDITIVE_EXPR )
+    def visit_primary_expr
+      bkup = @tokens.cur
+
+      if @tokens.token_type == :identifier
+        var = DummyCC::AST::Variable.new(@tokens.token_str)
+        @tokens.next
+        return var
+      elsif @tokens.token_type == :digit
+        num = DummyCC::AST::Number.new(@tokens.token_num)
+        @tokens.next
+        return num
+      elsif @tokens.token_type == :symbol && @tokens.token_str == '-'
+        @tokens.next
+        if @tokens.token_type == :digit
+          num = DummyCC::AST::Number.new(-@tokens.toen_num)
+          @tokens.next
+          return num
+        end
+        @tokens.cur = bkup
+      elsif @tokens.token_type == :symbol && @tokens.token_str == '('
+        @tokens.next
+        expr = visit_additive_expr(nil)
+        if expr && @tokens.token_type == :symbol && @tokens.token_str == ')'
+          @tokens.next
+          return expr
+        end
+        @tokens.cur = bkup
+      end
+
+      nil
     end
   end
 end
