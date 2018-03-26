@@ -93,7 +93,9 @@ module DummyCC
         @tokens.next
 
         break unless @tokens.token_type == :identifier
-        # TODO: 仮引数名重複チェック
+        if params.key?(@tokens.token_str)
+          raise DummyCC::DuplicateVariableNameError, "Duplicate variable names are found in #{name} at #{@tokens.token_lineno}"
+        end
         params[@tokens.token_str] = true
         @tokens.next
         is_first_param = false
