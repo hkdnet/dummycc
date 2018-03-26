@@ -66,6 +66,11 @@ module DummyCC
       is_first_param = true
       params = []
       loop do
+        if @tokens.token_str == ')'
+          @tokens.next
+          return DummyCC::AST::Prototype.new(name, params)
+        end
+
         if !is_first_param && @tokens.token_type == :symbol && @tokens.token_str == ','
           @tokens.next
         end
@@ -78,11 +83,6 @@ module DummyCC
         params << @tokens.token_str
         @tokens.next
         is_first_param = false
-
-        if @tokens.token_str == ')'
-          @tokens.next
-          return DummyCC::AST::Prototype.new(name, params)
-        end
       end
       @tokens.cur = bkup
       nil
