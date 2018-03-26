@@ -1,13 +1,13 @@
 require 'spec_helper'
 
 RSpec.describe DummyCC::Parser do
-  describe '疎通確認用' do
-    subject(:tu) { parser.exec }
+  subject(:tu) { parser.exec }
 
-    let(:parser) { DummyCC::Parser.new(tokens) }
-    let(:tokens) do
-      DummyCC::Lexer.new(text).parse
-    end
+  let(:parser) { DummyCC::Parser.new(tokens) }
+  let(:tokens) do
+    DummyCC::Lexer.new(text).parse
+  end
+  describe '疎通確認用' do
     let(:text) do
       <<-EOS
 int foo(int arg);
@@ -48,6 +48,33 @@ int bar(int arg1, int arg2) {
       stmt = bar_body.stmt_at(0)
       expect(stmt).to be_a DummyCC::AST::JumpStmt
       expect(stmt.expr).to eq DummyCC::AST::Number.new(1)
+    end
+  end
+
+  describe 'ローカル変数宣言' do
+    let(:text) do
+      <<-EOS
+int foo(int arg) {
+  int ret;
+  ret = 1;
+  return ret;
+}
+      EOS
+    end
+
+    it 'proto' do
+      foo = tu.func_at(0)
+      foo_body = foo.body
+
+      arg1 = foo_body.variable_decl_at(0)
+      expect(arg1.name).to eq 'arg'
+      expect(arg1.decl_type).to eq :param
+
+      arg2 = foo_body.variable_decl_at(1)
+      expect(arg2.name).to eq 'ret'
+      expect(arg2.decl_type).to eq :local
+
+      expect(foo_body.variable_decl_at(2)).to be_nil
     end
   end
 end
