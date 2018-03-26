@@ -38,7 +38,6 @@ int bar(int arg1, int arg2) {
     end
 
     it 'func_body' do
-
       bar_func = tu.func_at(0)
       bar_body = bar_func.body
       expect(bar_body.variable_decl_at(0).name).to eq 'arg1'
