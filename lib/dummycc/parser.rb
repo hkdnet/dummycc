@@ -170,7 +170,20 @@ module DummyCC
     end
 
     def visit_expression_stmt
-      # TODO: impl
+      bkup = @tokens.cur
+      if @tokens.token_str == ';'
+        @tokens.next
+        return DummyCC::AST::NullExpr.new
+      end
+      expr = visit_assignment_expr
+      if expr
+        unless @tokens.token_str == ';'
+          @tokens.cur = bkup
+          return nil
+        end
+        @tokens.next
+        return expr
+      end
       nil
     end
 
