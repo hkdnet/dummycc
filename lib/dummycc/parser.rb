@@ -98,21 +98,59 @@ module DummyCC
       DummyCC::AST::Function.new(proto, body)
     end
 
+    # FUNCITON_STMT := { VARIABLE_DECL_LIST [VARIABLE_DECL_LIST] STATEMENT_LIST }
+    # VARIABLE_DECL_LIST := VARIABLE_DECL [VARIABLE_DECL]
+    # VARIABLE_DECL := int IDENTIFIER;
+    # STATEMENT_LIST := STATEMENT [STATEMENT]
     # @return [DummyCC::AST::FunctionStmt]
     def visit_function_statement(proto)
       bkup = @tokens.cur
       return nil unless @tokens.token_str == '{'
       @tokens.next
       body = DummyCC::AST::FunctionStmt.new
-      until @tokens.token_str == '}'
-        @tokens.next
+      proto.each do |param_name|
+        decl = DummyCC::AST::VariableDecl.new(param_name, :param)
+        body.add_variable_decl(decl)
       end
-      unless @tokens.token_str == '}'
-        @tokens.cur = bkup
-        return nil
+
+      loop do
+        decl = visit_variable_declaration
+        if decl
+          body.add_variable_decl(decl)
+          next
+        end
+
+        stmt = visit_statement
+        if stmt
+          body.add_statement(stmt)
+          next
+        end
+
+        if @tokens.token_str == '}'
+          break
+        end
+        if @tokens.token_type == :eof
+          @tokens.cur = bkup
+          return nil
+        end
       end
       @tokens.next
       body
+    end
+
+    def visit_variable_declaration
+      # TODO: impl
+      nil
+    end
+
+    def visit_statement
+      return nil if @tokens.token_str == '}'
+      # TODO: impl
+      if @tokens.token_type == :return
+        @tokens.next
+        return DummyCC::AST::JumpStmt.new(nil)
+      end
+      @tokens.next
     end
   end
 end
