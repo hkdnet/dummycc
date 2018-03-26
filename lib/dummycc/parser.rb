@@ -249,6 +249,7 @@ module DummyCC
         end
         return visit_multiplicative_expr(DummyCC::AST::BinaryExpr.new('/', lhs, rhs))
       end
+      lhs
     end
 
     # POSTFIX_EXPR := PRIMARY_EXPR | IDENTIFIER ( [ASSIGNMENT_EXPR [, ASSIGNMENT_EXPR]] )
