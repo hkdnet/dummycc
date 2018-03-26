@@ -124,5 +124,17 @@ int foo() {
       end
     end
 
+    describe '型一致だけど重複' do
+      let(:text) do
+        <<-EOS
+  int foo(int a);
+  int foo(int b);
+        EOS
+      end
+
+      it do
+        expect { parser.exec }.to output("dup\n").to_stderr
+      end
+    end
   end
 end
