@@ -1,5 +1,10 @@
 module DummyCC::AST
   class Prototype
+    extend Forwardable
+    include Enumerable
+
+    delegate each: :@params
+
     attr_reader :name
 
     #@params name [String]
