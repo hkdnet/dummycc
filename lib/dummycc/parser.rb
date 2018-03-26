@@ -146,11 +146,52 @@ module DummyCC
     def visit_statement
       return nil if @tokens.token_str == '}'
       # TODO: impl
-      if @tokens.token_type == :return
-        @tokens.next
-        return DummyCC::AST::JumpStmt.new(nil)
+      stmt = visit_jump_stmt
+      return stmt if stmt
+      @tokens.next
+    end
+
+    def visit_jump_stmt
+      return nil unless @tokens.token_type == :return
+      bkup = @tokens.cur
+      @tokens.next
+      expr = visit_assignment_expr
+      unless expr
+        @tokens.cur = bkup
+        return nil
+      end
+
+      unless @tokens.token_type == :symbol && @tokens.token_str == ';'
+        @tokens.cur = bkup
+        return nil
       end
       @tokens.next
+      DummyCC::AST::JumpStmt.new(expr)
+    end
+
+    # ASSIGNMENT_EXPR := IDENTIFIER = ADDITIVE_EXPR | ADDITIVE_EXPR
+    def visit_assignment_expr
+      bkup = @tokens.cur
+      if @tokens.token_type == :identifier
+        l = DummyCC::AST::Variable.new(@tokens.token_str)
+        @tokens.next
+        if @tokens.token_type == :symbol && @tokens.token_str == '='
+          @tokens.next
+          r = visit_additive_expr
+          return DummyCC::AST::BinaryExpr.new("=", l, r) if r
+        end
+        @tokens.cur = bkup
+      end
+
+      add_expr = visit_additive_expr
+      return add_expr if add_expr
+      nil
+    end
+
+    def visit_additive_expr
+      # TODO: impl
+      @tokens.next
+      DummyCC::AST::Number.new(1)
     end
   end
 end
