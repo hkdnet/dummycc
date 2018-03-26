@@ -145,10 +145,16 @@ module DummyCC
 
     def visit_statement
       return nil if @tokens.token_str == '}'
-      # TODO: impl
+      stmt = visit_expression_stmt
+      return stmt if stmt
       stmt = visit_jump_stmt
       return stmt if stmt
       @tokens.next
+    end
+
+    def visit_expression_stmt
+      # TODO: impl
+      nil
     end
 
     def visit_jump_stmt
