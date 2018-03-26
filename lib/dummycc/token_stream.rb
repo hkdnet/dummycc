@@ -7,12 +7,6 @@ module DummyCC
       @tokens = []
     end
 
-    def debug
-      @tokens.each do |token|
-        puts token.inspect
-      end
-    end
-
     def add_token(token)
       @tokens << token
     end
