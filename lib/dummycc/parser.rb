@@ -276,13 +276,13 @@ module DummyCC
       expr = visit_primary_expr
       return expr if expr
 
-      unless @tokens.cur_type == :identifier
+      unless @tokens.token_type == :identifier
         return nil
       end
 
       callee = @tokens.cur_str
       @tokens.next
-      unless @tokens.cur_type == :symbol && @tokens.cur_str == '('
+      unless @tokens.token_type == :symbol && @tokens.cur_str == '('
         @tokens.cur = bkup
         return nil
       end
@@ -291,7 +291,7 @@ module DummyCC
       is_first_arg = true
       loop do
         if !is_first_arg
-          unless @tokens.cur_type == :symbol && @tokens.cur_str == ','
+          unless @tokens.token_type == :symbol && @tokens.cur_str == ','
             @tokens.cur = bkup
             return nil
           end
@@ -306,7 +306,7 @@ module DummyCC
         end
       end
 
-      unless @tokens.cur_type == :symbol && @tokens.cur_str == ')'
+      unless @tokens.token_type == :symbol && @tokens.cur_str == ')'
         @tokens.cur = bkup
         return nil
       end
