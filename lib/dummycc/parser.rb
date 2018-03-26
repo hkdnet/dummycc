@@ -40,7 +40,7 @@ module DummyCC
       proto = visit_prototype
       return nil unless proto
 
-      unless @tokens.token.str == ';'
+      unless @tokens.semicolon?
         # 関数定義だったので元に戻して visit_function_definition に任せる
         @tokens.cur = bkup
         return nil
@@ -60,18 +60,18 @@ module DummyCC
       return nil unless @tokens.token_type == :identifier
       name = @tokens.token_str
       @tokens.next
-      return nil unless @tokens.token_str == '('
+      return nil unless @tokens.l_paren?
       @tokens.next
 
       is_first_param = true
       params = []
       loop do
-        if @tokens.token_str == ')'
+        if @tokens.r_paren?
           @tokens.next
           return DummyCC::AST::Prototype.new(name, params)
         end
 
-        if !is_first_param && @tokens.token_type == :symbol && @tokens.token_str == ','
+        if !is_first_param && @tokens.comma?
           @tokens.next
         end
 
@@ -105,7 +105,7 @@ module DummyCC
     # @return [DummyCC::AST::FunctionStmt]
     def visit_function_statement(proto)
       bkup = @tokens.cur
-      return nil unless @tokens.token_str == '{'
+      return nil unless @tokens.l_brace?
       @tokens.next
       body = DummyCC::AST::FunctionStmt.new
       proto.each do |param_name|
@@ -126,7 +126,7 @@ module DummyCC
           next
         end
 
-        if @tokens.token_str == '}'
+        if @tokens.r_brace?
           break
         end
         if @tokens.token_type == :eof
@@ -152,7 +152,7 @@ module DummyCC
       end
       name = @tokens.token_str
       @tokens.next
-      unless @tokens.token_type == :symbol && @tokens.token_str == ';'
+      unless @tokens.semicolon?
         @tokens.cur = bkup
         return nil
       end
@@ -161,7 +161,7 @@ module DummyCC
     end
 
     def visit_statement
-      return nil if @tokens.token_str == '}'
+      return nil if @tokens.r_brace?
       stmt = visit_expression_stmt
       return stmt if stmt
       stmt = visit_jump_stmt
@@ -171,13 +171,13 @@ module DummyCC
 
     def visit_expression_stmt
       bkup = @tokens.cur
-      if @tokens.token_str == ';'
+      if @tokens.semicolon?
         @tokens.next
         return DummyCC::AST::NullExpr.new
       end
       expr = visit_assignment_expr
       if expr
-        unless @tokens.token_str == ';'
+        unless @tokens.semicolon?
           @tokens.cur = bkup
           return nil
         end
@@ -197,7 +197,7 @@ module DummyCC
         return nil
       end
 
-      unless @tokens.token_type == :symbol && @tokens.token_str == ';'
+      unless @tokens.semicolon?
         @tokens.cur = bkup
         return nil
       end
@@ -211,7 +211,7 @@ module DummyCC
       if @tokens.token_type == :identifier
         l = DummyCC::AST::Variable.new(@tokens.token_str)
         @tokens.next
-        if @tokens.token_type == :symbol && @tokens.token_str == '='
+        if @tokens.symbol_eq?
           @tokens.next
           r = visit_additive_expr(nil)
           return DummyCC::AST::BinaryExpr.new("=", l, r) if r
@@ -232,7 +232,7 @@ module DummyCC
         lhs = visit_multiplicative_expr(nil)
         return nil if lhs.nil?
       end
-      if @tokens.token_type == :symbol && @tokens.token_str == '+'
+      if @tokens.plus?
         @tokens.next
         rhs = visit_multiplicative_expr(nil)
         unless rhs
@@ -240,7 +240,7 @@ module DummyCC
           return nil
         end
         return visit_additive_expr(DummyCC::AST::BinaryExpr.new('+', lhs, rhs))
-      elsif @tokens.token_type == :symbol && @tokens.token_str == '-'
+      elsif @tokens.minus?
         @tokens.next
         rhs = visit_multiplicative_expr(nil)
         unless rhs
@@ -260,7 +260,7 @@ module DummyCC
         return nil if lhs.nil?
       end
 
-      if @tokens.token_type == :symbol && @tokens.token_str == '*'
+      if @tokens.asterisk?
         @tokens.next
 
         rhs = visit_postfix_expr
@@ -269,7 +269,7 @@ module DummyCC
           return nil
         end
         return visit_multiplicative_expr(DummyCC::AST::BinaryExpr.new('*', lhs, rhs))
-      elsif @tokens.token_type == :symbol && @tokens.token_str == '/'
+      elsif @tokens.slash?
         @tokens.next
 
         rhs = visit_postfix_expr
@@ -295,7 +295,7 @@ module DummyCC
 
       callee = @tokens.cur_str
       @tokens.next
-      unless @tokens.token_type == :symbol && @tokens.cur_str == '('
+      unless @tokens.l_paren?
         @tokens.cur = bkup
         return nil
       end
@@ -304,7 +304,7 @@ module DummyCC
       is_first_arg = true
       loop do
         if !is_first_arg
-          unless @tokens.token_type == :symbol && @tokens.cur_str == ','
+          unless @tokens.comma?
             @tokens.cur = bkup
             return nil
           end
@@ -319,7 +319,7 @@ module DummyCC
         end
       end
 
-      unless @tokens.token_type == :symbol && @tokens.cur_str == ')'
+      unless @tokens.r_paren?
         @tokens.cur = bkup
         return nil
       end
@@ -340,7 +340,7 @@ module DummyCC
         num = DummyCC::AST::Number.new(@tokens.token_num)
         @tokens.next
         return num
-      elsif @tokens.token_type == :symbol && @tokens.token_str == '-'
+      elsif @tokens.minus?
         @tokens.next
         if @tokens.token_type == :digit
           num = DummyCC::AST::Number.new(-@tokens.toen_num)
@@ -348,10 +348,10 @@ module DummyCC
           return num
         end
         @tokens.cur = bkup
-      elsif @tokens.token_type == :symbol && @tokens.token_str == '('
+      elsif @tokens.l_paren?
         @tokens.next
         expr = visit_additive_expr(nil)
-        if expr && @tokens.token_type == :symbol && @tokens.token_str == ')'
+        if expr && @tokens.r_paren?
           @tokens.next
           return expr
         end
