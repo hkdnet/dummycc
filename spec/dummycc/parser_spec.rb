@@ -109,4 +109,44 @@ int foo() {
       expect(foo_body.stmt_at(3)).to be_nil
     end
   end
+
+  context 'error' do
+    describe '型不一致' do
+      let(:text) do
+        <<-EOS
+  int foo(int a);
+  int foo(int a, int b);
+        EOS
+      end
+
+      it do
+        expect { parser.exec }.to raise_error DummyCC::ConflictingTypesError
+      end
+    end
+
+    describe '型一致だけど重複' do
+      let(:text) do
+        <<-EOS
+  int foo(int a);
+  int foo(int b);
+        EOS
+      end
+
+      it do
+        expect { parser.exec }.to output("Duplicated function declaration for foo\n").to_stderr
+      end
+    end
+
+    describe '仮引数の重複' do
+      let(:text) do
+        <<-EOS
+  int foo(int a, int a);
+        EOS
+      end
+
+      it do
+        expect { parser.exec }.to raise_error(DummyCC::DuplicateVariableNameError, "Duplicate variable names are found in foo at 1")
+      end
+    end
+  end
 end

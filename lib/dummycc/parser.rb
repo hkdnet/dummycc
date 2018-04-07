@@ -3,6 +3,7 @@ module DummyCC
     # @params tokens [DummyCC::TokenStream]
     def initialize(tokens)
       @tokens = tokens
+      @signatures = {}
     end
 
     def exec
@@ -24,11 +25,14 @@ module DummyCC
     def visit_external_declaration(tu)
       proto = visit_function_declaration
       if proto
+        @signatures[proto.name] = proto.to_signature
         tu.add_proto(proto)
         return
       end
       func_def = visit_function_definition
       if func_def
+        proto = func_def.proto
+        @signatures[proto.name] = proto.to_signature
         tu.add_func(func_def)
         return
       end
@@ -45,7 +49,17 @@ module DummyCC
         @tokens.cur = bkup
         return nil
       end
-      # TODO: 再定義チェック
+
+      # 再定義チェック
+      if @signatures.key?(proto.name)
+        if proto.to_signature == @signatures[proto.name]
+          # 完全一致なのでwarningだけ
+          warn("Duplicated function declaration for #{proto.name}")
+        else
+          raise DummyCC::ConflictingTypesError, "for function #{proto.name}"
+        end
+      end
+
       @tokens.next
       proto
     end
@@ -64,11 +78,11 @@ module DummyCC
       @tokens.next
 
       is_first_param = true
-      params = []
+      params = {}
       loop do
         if @tokens.r_paren?
           @tokens.next
-          return DummyCC::AST::Prototype.new(name, params)
+          return DummyCC::AST::Prototype.new(name, params.keys)
         end
 
         if !is_first_param && @tokens.comma?
@@ -79,8 +93,10 @@ module DummyCC
         @tokens.next
 
         break unless @tokens.token_type == :identifier
-        # TODO: 仮引数名重複チェック
-        params << @tokens.token_str
+        if params.key?(@tokens.token_str)
+          raise DummyCC::DuplicateVariableNameError, "Duplicate variable names are found in #{name} at #{@tokens.token_lineno}"
+        end
+        params[@tokens.token_str] = true
         @tokens.next
         is_first_param = false
       end

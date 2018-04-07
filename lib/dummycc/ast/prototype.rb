@@ -22,5 +22,9 @@ module DummyCC::AST
     def params_size
       @params.size
     end
+
+    def to_signature
+      DummyCC::FunctionSignature.new(name, :int, map { :int })
+    end
   end
 end

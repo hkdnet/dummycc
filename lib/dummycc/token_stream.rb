@@ -32,6 +32,10 @@ module DummyCC
       token.num
     end
 
+    def token_lineno
+      token.lineno
+    end
+
     def plus?
       token_type == :symbol && token_str == '+'
     end
